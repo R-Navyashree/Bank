@@ -67,10 +67,10 @@ function Dashboard() {
         </div>
         
         <div className="navbar-center">
-          <a href="#" className="nav-link active">Home</a>
-          <a href="#" className="nav-link">Balance</a>
-          <a href="#" className="nav-link">Security</a>
-          <a href="#" className="nav-link">Profile</a>
+          <button className="nav-link active">Home</button>
+          <button className="nav-link">Balance</button>
+          <button className="nav-link">Security</button>
+          <button className="nav-link">Profile</button>
         </div>
         
         <div className="navbar-right">
