@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
+import API_URL from '../config';
 import '../styles/Dashboard.css';
 
 function Dashboard() {
@@ -12,7 +13,7 @@ function Dashboard() {
   const role = localStorage.getItem('role') || 'Customer';
 
   const getInitial = () => username.charAt(0).toUpperCase();
-  
+
   const getMemberSince = () => {
     const date = new Date();
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -21,18 +22,18 @@ function Dashboard() {
   const handleRevealBalance = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/getBalance', {
+      const res = await fetch(`${API_URL}/api/getBalance`, {
         credentials: 'include'
       });
 
       if (res.ok) {
         const data = await res.json();
-        
+
         setTimeout(() => {
           setBalance(data.balance);
           setShowBalance(true);
           setLoading(false);
-          
+
           confetti({
             particleCount: 120,
             spread: 80,
@@ -49,7 +50,7 @@ function Dashboard() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
     localStorage.clear();
     navigate('/login');
   };
@@ -65,14 +66,14 @@ function Dashboard() {
           </div>
           <div className="logo-underline"></div>
         </div>
-        
+
         <div className="navbar-center">
           <button className="nav-link active">Home</button>
           <button className="nav-link">Balance</button>
           <button className="nav-link">Security</button>
           <button className="nav-link">Profile</button>
         </div>
-        
+
         <div className="navbar-right">
           <span className="navbar-greeting">Hey, {username}! 👋</span>
           <div className="navbar-avatar">{getInitial()}</div>
@@ -89,7 +90,7 @@ function Dashboard() {
               <div className="hero-label">YOUR ACCOUNT OVERVIEW</div>
               <h1 className="hero-heading">Welcome back, {username}!</h1>
               <p className="hero-subtitle">Your finances are secure and up to date.</p>
-              
+
               <div className="hero-tags">
                 <span className="hero-tag">🔒 Secure</span>
                 <span className="hero-tag">🚀 Active</span>
@@ -103,7 +104,7 @@ function Dashboard() {
                 <div className="balance-title">Your Balance</div>
               </div>
               <div className="balance-subtitle">Tap reveal to see your balance</div>
-              
+
               <div className="balance-display">
                 {!balance || !showBalance ? (
                   <div className="balance-masked">₹ • • • • • •</div>
@@ -111,10 +112,10 @@ function Dashboard() {
                   <div className="balance-amount">₹{balance.toLocaleString('en-IN')}</div>
                 )}
               </div>
-              
+
               {!balance ? (
-                <button 
-                  className="reveal-btn" 
+                <button
+                  className="reveal-btn"
                   onClick={handleRevealBalance}
                   disabled={loading}
                 >
@@ -122,8 +123,8 @@ function Dashboard() {
                 </button>
               ) : (
                 <>
-                  <button 
-                    className="reveal-btn" 
+                  <button
+                    className="reveal-btn"
                     onClick={() => setShowBalance(!showBalance)}
                   >
                     {showBalance ? 'Hide Balance' : 'Show Balance →'}
@@ -147,7 +148,7 @@ function Dashboard() {
                   <div className="card-subtext">Personal account</div>
                 </div>
               </div>
-              
+
               <div className="account-card">
                 <div className="card-icon">✅</div>
                 <div className="card-content">
@@ -156,7 +157,7 @@ function Dashboard() {
                   <div className="card-subtext">All systems normal</div>
                 </div>
               </div>
-              
+
               <div className="account-card">
                 <div className="card-icon">🔒</div>
                 <div className="card-content">
@@ -165,7 +166,7 @@ function Dashboard() {
                   <div className="card-subtext">Token based</div>
                 </div>
               </div>
-              
+
               <div className="account-card">
                 <div className="card-icon">📅</div>
                 <div className="card-content">
@@ -186,13 +187,13 @@ function Dashboard() {
               <div className="feature-title">Bank-grade Security</div>
               <div className="feature-desc">Your data is always encrypted</div>
             </div>
-            
+
             <div className="feature-card">
               <div className="feature-icon">⚡</div>
               <div className="feature-title">Instant Updates</div>
               <div className="feature-desc">Real-time balance and activity</div>
             </div>
-            
+
             <div className="feature-card">
               <div className="feature-icon">📊</div>
               <div className="feature-title">Smart Dashboard</div>

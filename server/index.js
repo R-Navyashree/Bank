@@ -11,7 +11,10 @@ const PORT = process.env.PORT || 5000;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'kodbank_super_secret_key_2024';
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://bank1-git-main-r-navyashrees-projects.vercel.app', 'https://bank1-r-navyashrees-projects.vercel.app'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -28,7 +31,7 @@ let pool;
 
 async function initDB() {
   pool = mysql.createPool(dbConfig);
-  
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS KodUser (
       uid INT AUTO_INCREMENT PRIMARY KEY,
@@ -40,7 +43,7 @@ async function initDB() {
       role VARCHAR(50) DEFAULT 'Customer'
     )
   `);
-  
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS UserToken (
       tid INT AUTO_INCREMENT PRIMARY KEY,
@@ -50,25 +53,25 @@ async function initDB() {
       FOREIGN KEY (uid) REFERENCES KodUser(uid)
     )
   `);
-  
+
   console.log('✅ Database tables initialized');
 }
 
 app.post('/api/register', async (req, res) => {
   try {
     const { username, email, password, phone } = req.body;
-    
+
     if (!username || !email || !password) {
       return res.status(400).json({ error: 'All fields required' });
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     await pool.query(
       'INSERT INTO KodUser (username, email, password, phone) VALUES (?, ?, ?, ?)',
       [username, email, hashedPassword, phone]
     );
-    
+
     res.json({ message: 'Registration successful' });
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') {
@@ -81,33 +84,33 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     const [users] = await pool.query('SELECT * FROM KodUser WHERE username = ?', [username]);
-    
+
     if (users.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const user = users[0];
     const validPassword = await bcrypt.compare(password, user.password);
-    
+
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    
+
     const token = jwt.sign(
       { username: user.username, role: user.role },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
-    
+
     const expiry = new Date(Date.now() + 3600000);
     await pool.query(
       'INSERT INTO UserToken (token, uid, expiry) VALUES (?, ?, ?)',
       [token, user.uid, expiry]
     );
-    
-    res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
+
+    res.cookie('token', token, { httpOnly: true, maxAge: 3600000, sameSite: 'none', secure: true });
     res.json({ message: 'Login successful', username: user.username, role: user.role });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
@@ -117,19 +120,19 @@ app.post('/api/login', async (req, res) => {
 app.get('/api/getBalance', async (req, res) => {
   try {
     const token = req.cookies.token;
-    
+
     if (!token) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
-    
+
     const decoded = jwt.verify(token, JWT_SECRET);
-    
+
     const [users] = await pool.query('SELECT balance FROM KodUser WHERE username = ?', [decoded.username]);
-    
+
     if (users.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     res.json({ balance: users[0].balance });
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });

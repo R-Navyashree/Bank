@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import API_URL from '../config';
 import '../styles/Register.css';
 
 function Register() {
@@ -22,7 +23,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -58,24 +59,24 @@ function Register() {
             <div className="logo-icon"></div>
             <span className="logo-text">KodBank</span>
           </div>
-          
+
           <div className="divider"></div>
-          
+
           <div className="tagline-section">
             <h1 className="tagline">Professional Banking.</h1>
             <p className="subtitle">Secure. Fast. Reliable.</p>
-            
+
             <div className="about-kodbank">
               <p>
                 KodBank represents the future of digital banking, combining cutting-edge technology with traditional banking values. Our platform leverages state-of-the-art 256-bit encryption and JWT-based authentication to ensure complete security for every transaction.
               </p>
-              
+
               <p>
                 We believe banking should be accessible and intuitive. With real-time balance updates and a user-friendly interface, you maintain complete control over your finances. Join thousands of satisfied customers experiencing smarter, more secure banking with KodBank today.
               </p>
             </div>
           </div>
-          
+
           <div className="features-list">
             <div className="feature-item">
               <div className="feature-bullet"></div>
@@ -90,7 +91,7 @@ function Register() {
               <span>Real-time balance updates</span>
             </div>
           </div>
-          
+
           <div className="version-tag">v1.0.0</div>
         </div>
       </div>
